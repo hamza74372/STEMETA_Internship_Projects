@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Employee Attrition Predictor</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #eef2f7;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    .container {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 0 18px rgba(0,0,0,0.1);
+        max-width: 700px;
+        width: 100%;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+    h2 {
+        margin-bottom: 25px;
+        text-align: center;
+        color: #333;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+    }
+    form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px 30px;
+    }
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #555;
+    }
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 1em;
+        border: 1.8px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s ease;
+    }
+    input[type="number"]:focus,
+    select:focus {
+        border-color: #007BFF;
+        outline: none;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+    }
+    .full-width {
+        grid-column: 1 / -1;
+    }
+    input[type="submit"] {
+        grid-column: 1 / -1;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 14px 0;
+        font-size: 1.15em;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    .result {
+        margin-top: 25px;
+        padding: 15px 20px;
+        border-radius: 10px;
+        background-color: #d1e7fd;
+        color: #004085;
+        font-weight: 600;
+        font-size: 1.3em;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+    @media (max-width: 700px) {
+        form {
+            grid-template-columns: 1fr;
+        }
+        input[type="submit"],
+        .result {
+            grid-column: 1;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Predict Employee Attrition</h2>
+    <form method="POST" action="/predict">
+        {% for field in form_fields %}
+            <div>
+                <label for="{{ field.name }}">{{ field.name.replace('_', ' ') }}</label>
+                {% if field.type == 'number' %}
+                    <input type="number" id="{{ field.name }}" name="{{ field.name }}" required step="any">
+                {% elif field.type == 'select' %}
+                    <select id="{{ field.name }}" name="{{ field.name }}" required>
+                        <option value="" disabled selected>Select</option>
+                        {% for option in field.options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <input type="submit" value="Predict">
+        {% if prediction %}
+            <div class="result">{{ prediction }}</div>
+        {% endif %}
+    </form>
+</div>
+</body>
+</html>
