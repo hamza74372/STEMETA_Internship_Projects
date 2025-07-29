@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Disease Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #feca57 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h2 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #0d0e0d, #15424c, #96ceb4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 35px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -0.5px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(255, 107, 107, 0.15), 
+                        0 15px 35px rgba(78, 205, 196, 0.15),
+                        0 5px 15px rgba(69, 183, 209, 0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 25px 25px 0 0;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 0.95rem;
+            letter-spacing: 0.025em;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+            color: #2d3748;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) padding-box,
+                        linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1) border-box;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        input[type="text"]:hover, select:hover {
+            border-color: #ff6b6b;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+        }
+        
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        input[type="submit"] {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #feca57 100%);
+            background-size: 300% 300%;
+            animation: buttonGradient 6s ease infinite;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            letter-spacing: 0.025em;
+            font-family: inherit;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes buttonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        input[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4),
+                        0 8px 20px rgba(78, 205, 196, 0.2),
+                        0 4px 15px rgba(69, 183, 209, 0.2);
+            animation-duration: 3s;
+        }
+        
+        input[type="submit"]:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #10b981, #34d399, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+            border-radius: 15px 15px 0 0;
+        }
+        
+        /* Custom styling for better mobile experience */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+            
+            h2 {
+                font-size: 2rem;
+                margin-bottom: 25px;
+            }
+            
+            form {
+                padding: 30px 25px;
+                border-radius: 20px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+        }
+        
+        /* Colorful animations */
+        .form-group {
+            animation: colorfulFadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .form-group:nth-child(odd) {
+            animation-name: colorfulFadeInUpLeft;
+        }
+        
+        .form-group:nth-child(even) {
+            animation-name: colorfulFadeInUpRight;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.15s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.25s; }
+        .form-group:nth-child(5) { animation-delay: 0.3s; }
+        .form-group:nth-child(6) { animation-delay: 0.35s; }
+        .form-group:nth-child(7) { animation-delay: 0.4s; }
+        .form-group:nth-child(8) { animation-delay: 0.45s; }
+        .form-group:nth-child(9) { animation-delay: 0.5s; }
+        .form-group:nth-child(10) { animation-delay: 0.55s; }
+        .form-group:nth-child(11) { animation-delay: 0.6s; }
+        .form-group:nth-child(12) { animation-delay: 0.65s; }
+        .form-group:nth-child(13) { animation-delay: 0.7s; }
+        
+        @keyframes colorfulFadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes colorfulFadeInUpLeft {
+            from {
+                opacity: 0;
+                transform: translateY(30px) translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        @keyframes colorfulFadeInUpRight {
+            from {
+                opacity: 0;
+                transform: translateY(30px) translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        /* Improved placeholder styling */
+        ::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+        
+        /* Focus ring for accessibility */
+        input[type="text"]:focus-visible, select:focus-visible {
+            outline: 2px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+        
+        /* Add some colorful accents */
+        .form-group:nth-child(odd) {
+            border-left: 3px solid transparent;
+            border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4) 1;
+            padding-left: 8px;
+        }
+        
+        .form-group:nth-child(even) {
+            border-right: 3px solid transparent;
+            border-image: linear-gradient(45deg, #45b7d1, #96ceb4) 1;
+            padding-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Heart Disease Prediction</h2>
+        <form method="POST" action="/predict">
+
+            <!-- Age -->
+            <div class="form-group">
+                <label>Age (years)</label>
+                <input type="text" name="age" required placeholder="e.g. 54">
+            </div>
+
+            <!-- Sex -->
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="sex" required>
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+
+            <!-- Chest Pain Type -->
+            <div class="form-group">
+                <label>Chest Pain Type</label>
+                <select name="cp" required>
+                    <option value="" disabled selected>Select type</option>
+                    <option value="0">Typical Angina</option>
+                    <option value="1">Atypical Angina</option>
+                    <option value="2">Non-anginal Pain</option>
+                    <option value="3">Asymptomatic</option>
+                </select>
+            </div>
+
+            <!-- Resting Blood Pressure -->
+            <div class="form-group">
+                <label>Resting Blood Pressure (mm Hg)</label>
+                <input type="text" name="trestbps" required placeholder="e.g. 130">
+            </div>
+
+            <!-- Cholesterol -->
+            <div class="form-group">
+                <label>Cholesterol (mg/dl)</label>
+                <input type="text" name="chol" required placeholder="e.g. 250">
+            </div>
+
+            <!-- Fasting Blood Sugar -->
+            <div class="form-group">
+                <label>Fasting Blood Sugar > 120 mg/dl</label>
+                <select name="fbs" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">True</option>
+                    <option value="0">False</option>
+                </select>
+            </div>
+
+            <!-- Resting ECG -->
+            <div class="form-group">
+                <label>Resting ECG Results</label>
+                <select name="restecg" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="0">Normal</option>
+                    <option value="1">ST-T Wave Abnormality</option>
+                    <option value="2">Left Ventricular Hypertrophy</option>
+                </select>
+            </div>
+
+            <!-- Max Heart Rate Achieved -->
+            <div class="form-group">
+                <label>Max Heart Rate Achieved</label>
+                <input type="text" name="thalach" required placeholder="e.g. 150">
+            </div>
+
+            <!-- Exercise Induced Angina -->
+            <div class="form-group">
+                <label>Exercise Induced Angina</label>
+                <select name="exang" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <!-- ST Depression Induced -->
+            <div class="form-group">
+                <label>ST Depression Induced by Exercise</label>
+                <input type="text" name="oldpeak" required placeholder="e.g. 1.4">
+            </div>
+
+            <!-- Slope of ST segment -->
+            <div class="form-group">
+                <label>Slope of Peak Exercise ST Segment</label>
+                <select name="slope" required>
+                    <option value="" disabled selected>Select slope</option>
+                    <option value="0">Upsloping</option>
+                    <option value="1">Flat</option>
+                    <option value="2">Downsloping</option>
+                </select>
+            </div>
+
+            <!-- Number of Major Vessels -->
+            <div class="form-group">
+                <label>Number of Major Vessels Colored by Fluoroscopy</label>
+                <select name="ca" required>
+                    <option value="" disabled selected>Select number</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+
+            <!-- Thalassemia -->
+            <div class="form-group">
+                <label>Thalassemia</label>
+                <select name="thal" required>
+                    <option value="" disabled selected>Select type</option>
+                    <option value="1">Normal</option>
+                    <option value="2">Fixed Defect</option>
+                    <option value="3">Reversible Defect</option>
+                </select>
+            </div>
+
+            <input type="submit" value="Predict">
+        </form>
+
+        {% if prediction %}
+        <div class="result">{{ prediction }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
