@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personality Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+
+        .feature-card {
+            background: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: none;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-bottom: none;
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body-custom {
+            padding: 2rem;
+        }
+
+        .slider-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .slider-container:hover {
+            background: #e9ecef;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .slider-label {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .slider-desc {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .form-range {
+            height: 8px;
+            background: linear-gradient(90deg, #e9ecef 0%, #e9ecef 100%);
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-range::-webkit-slider-thumb {
+            appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .form-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-range::-moz-range-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .value-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .value-badge {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .predict-btn {
+            background: var(--success-gradient);
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(67, 233, 123, 0.4);
+            color: white;
+        }
+
+        .predict-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .predict-btn:hover::before {
+            left: 100%;
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            color: #2c3e50;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .prediction-result {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .confidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .confidence-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .confidence-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .input-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .card-body-custom {
+                padding: 1.5rem;
+            }
+            
+            .slider-container {
+                padding: 1rem;
+            }
+            
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .confidence-grid,
+            .inputs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">
+                <i class="fas fa-brain"></i>
+                Personality Predictor
+            </h1>
+            <p class="hero-subtitle">
+                Discover your personality type through advanced psychological analysis
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-container">
+            <form method="POST" id="personalityForm">
+                {% for group, features in feature_groups.items() %}
+                <div class="feature-card">
+                    <div class="card-header-custom">
+                        <h4 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            {{ group }}
+                        </h4>
+                    </div>
+                    <div class="card-body-custom">
+                        {% for feature, desc in features %}
+                        <div class="slider-container">
+                            <label for="{{ feature }}" class="slider-label">
+                                {{ feature.replace('_', ' ').title() }}
+                            </label>
+                            <div class="slider-desc">{{ desc }}</div>
+                            <input type="range" 
+                                   class="form-range" 
+                                   min="0" 
+                                   max="10" 
+                                   step="0.1" 
+                                   id="{{ feature }}" 
+                                   name="{{ feature }}"
+                                   value="{{ inputs[feature] if inputs else 5 }}" 
+                                   title="{{ desc }}">
+                            <div class="value-display">
+                                <span class="text-muted">Low (0)</span>
+                                <span class="value-badge" id="{{ feature }}_val">
+                                    {{ inputs[feature] if inputs else 5 }}
+                                </span>
+                                <span class="text-muted">High (10)</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="text-center">
+                    <button type="submit" class="predict-btn">
+                        <i class="fas fa-magic"></i>
+                        Predict My Personality
+                    </button>
+                </div>
+            </form>
+
+            {% if prediction %}
+            <div class="result-section">
+                <h3 class="result-title">
+                    <i class="fas fa-star"></i>
+                    Your Personality Analysis
+                </h3>
+                
+                <div class="prediction-result">
+                    <i class="fas fa-award"></i>
+                    {{ prediction }}
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-chart-pie"></i>
+                    Confidence Scores
+                </div>
+                <div class="confidence-grid">
+                    {% for label, prob in probabilities.items() %}
+                    <div class="confidence-item">
+                        <strong>{{ label }}</strong>
+                        <span class="value-badge">{{ prob }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-sliders-h"></i>
+                    Your Input Values
+                </div>
+                <div class="inputs-grid">
+                    {% for key, val in inputs.items() %}
+                    <div class="input-item">
+                        <strong>{{ key.replace('_', ' ').title() }}</strong>
+                        <span class="value-badge">{{ "%.2f"|format(val) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update slider value display dynamically
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', e => {
+                const value = parseFloat(e.target.value).toFixed(1);
+                document.getElementById(e.target.id + '_val').innerText = value;
+            });
+        });
+
+        // Add loading animation on form submit
+        document.getElementById('personalityForm').addEventListener('submit', function() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        });
+
+        // Smooth scroll to results if they exist
+        {% if prediction %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultSection = document.querySelector('.result-section');
+            if (resultSection) {
+                setTimeout(() => {
+                    resultSection.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 300);
+            }
+        });
+        {% endif %}
+
+        // Add visual feedback for form interactions
+        document.querySelectorAll('.form-range').forEach(slider => {
+            slider.addEventListener('input', function() {
+                this.style.background = `linear-gradient(90deg, #667eea 0%, #667eea ${(this.value / this.max) * 100}%, #e9ecef ${(this.value / this.max) * 100}%, #e9ecef 100%)`;
+            });
+            
+            // Initialize slider background
+            slider.dispatchEvent(new Event('input'));
+        });
+    </script>
+</body>
+</html>
