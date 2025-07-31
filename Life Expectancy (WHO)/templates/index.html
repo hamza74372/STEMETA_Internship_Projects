@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Life Expectancy Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+        label {
+            font-weight: bold;
+        }
+        .slider-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Predict Life Expectancy</h2>
+    <form action="/predict" method="post">
+
+        {% for field, min_val, max_val, step in [
+            ("Year", 2000, 2015, 1),
+            ("Adult Mortality", 1, 723, 1),
+            ("infant deaths", 0, 1800, 1),
+            ("Alcohol", 0, 18, 0.1),
+            ("percentage expenditure", 0, 20000, 1),
+            ("Hepatitis B", 0, 100, 1),
+            ("Measles", 0, 250000, 1),
+            ("BMI", 1, 100, 0.1),
+            ("under-five deaths", 0, 2500, 1),
+            ("Polio", 0, 100, 1),
+            ("Total expenditure", 0, 20, 0.1),
+            ("Diphtheria", 0, 100, 1),
+            ("HIV/AIDS", 0, 50, 0.1),
+            ("GDP", 0, 120000, 10),
+            ("Population", 0, 1400000000, 1000000),
+            ("thinness 1-19 years", 0, 30, 0.1),
+            ("thinness 5-9 years", 0, 30, 0.1),
+            ("Income composition of resources", 0, 1, 0.01),
+            ("Schooling", 0, 21, 0.1)
+        ] %}
+        <div class="slider-container">
+            <label for="{{ field }}">{{ field }}</label><br>
+            <input type="range" name="{{ field }}" id="{{ field }}" min="{{ min_val }}" max="{{ max_val }}" step="{{ step }}" oninput="document.getElementById('{{ field }}_val').innerText = this.value">
+            <span id="{{ field }}_val">{{ (min_val + max_val) // 2 }}</span>
+        </div>
+        {% endfor %}
+
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction_text %}
+        <h3>Prediction: {{ prediction_text }}</h3>
+    {% endif %}
+</body>
+</html>
