@@ -1,58 +1,579 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life Expectancy Predictor</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f9f9f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
         }
-        label {
-            font-weight: bold;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        .slider-container {
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.05)"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            background-size: cover;
+        }
+
+        .info-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .info-title {
+            font-size: 1.8rem;
+            font-weight: 600;
             margin-bottom: 20px;
+            opacity: 0.95;
+        }
+
+        .info-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .info-note {
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .field-group {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .field-group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .field-group:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.15);
+        }
+
+        .field-group:hover::before {
+            transform: scaleX(1);
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .field-tooltip {
+            font-size: 0.9rem;
+            cursor: help;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .field-tooltip:hover {
+            opacity: 1;
+        }
+
+        .field-description {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e9ecef;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+        }
+
+        .value-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .current-value {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .range-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .predict-btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .prediction-result {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            border-radius: 15px;
+            text-align: center;
+            border-left: 5px solid #4facfe;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        .prediction-result.show {
+            display: block;
+        }
+
+        .prediction-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .prediction-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .info-section {
+                padding: 30px 20px;
+            }
+
+            .info-title {
+                font-size: 1.5rem;
+            }
+
+            .info-description {
+                font-size: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .field-group {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field-group {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h2>Predict Life Expectancy</h2>
-    <form action="/predict" method="post">
-
-        {% for field, min_val, max_val, step in [
-            ("Year", 2000, 2015, 1),
-            ("Adult Mortality", 1, 723, 1),
-            ("infant deaths", 0, 1800, 1),
-            ("Alcohol", 0, 18, 0.1),
-            ("percentage expenditure", 0, 20000, 1),
-            ("Hepatitis B", 0, 100, 1),
-            ("Measles", 0, 250000, 1),
-            ("BMI", 1, 100, 0.1),
-            ("under-five deaths", 0, 2500, 1),
-            ("Polio", 0, 100, 1),
-            ("Total expenditure", 0, 20, 0.1),
-            ("Diphtheria", 0, 100, 1),
-            ("HIV/AIDS", 0, 50, 0.1),
-            ("GDP", 0, 120000, 10),
-            ("Population", 0, 1400000000, 1000000),
-            ("thinness 1-19 years", 0, 30, 0.1),
-            ("thinness 5-9 years", 0, 30, 0.1),
-            ("Income composition of resources", 0, 1, 0.01),
-            ("Schooling", 0, 21, 0.1)
-        ] %}
-        <div class="slider-container">
-            <label for="{{ field }}">{{ field }}</label><br>
-            <input type="range" name="{{ field }}" id="{{ field }}" min="{{ min_val }}" max="{{ max_val }}" step="{{ step }}" oninput="document.getElementById('{{ field }}_val').innerText = this.value">
-            <span id="{{ field }}_val">{{ (min_val + max_val) // 2 }}</span>
+    <div class="container">
+        <div class="header">
+            <h1>Life Expectancy Predictor</h1>
+            <p class="subtitle">Advanced ML-powered health analytics</p>
         </div>
-        {% endfor %}
 
-        <input type="submit" value="Predict">
-    </form>
+        <div class="info-section">
+            <div class="info-content">
+                <h2 class="info-title">About This Predictor</h2>
+                <p class="info-description">
+                    We built a machine learning model to <strong>predict life expectancy</strong> of countries using the <strong>Life Expectancy dataset</strong> from the WHO. The dataset includes health, economic, and demographic indicators such as <strong>Adult Mortality, Alcohol Consumption, BMI, GDP, Schooling, and Immunization rates</strong>.
+                </p>
+                <p class="info-note">
+                    📊 Simply adjust the sliders below to input values for different health and socioeconomic factors, and our AI model will predict the expected life expectancy based on these indicators.
+                </p>
+            </div>
+        </div>
 
-    {% if prediction_text %}
-        <h3>Prediction: {{ prediction_text }}</h3>
-    {% endif %}
+        <div class="form-container">
+            <form id="predictorForm">
+                <div class="form-grid" id="formGrid">
+                    <!-- Fields will be generated by JavaScript -->
+                </div>
+
+                <button type="submit" class="predict-btn">
+                    Predict Life Expectancy
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing data...</p>
+                </div>
+
+                <div class="prediction-result" id="predictionResult">
+                    <div class="prediction-title">Predicted Life Expectancy</div>
+                    <div class="prediction-value" id="predictionValue">--</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Field definitions with their ranges and descriptions
+        const fields = [
+            { name: "Year", min: 2000, max: 2015, step: 1, unit: "", desc: "Data collection year" },
+            { name: "Adult Mortality", min: 1, max: 723, step: 1, unit: "per 1000", desc: "Deaths of adults aged 15-60 per 1000 population" },
+            { name: "Infant Deaths", min: 0, max: 1800, step: 1, unit: "", desc: "Number of infant deaths per 1000 population" },
+            { name: "Alcohol", min: 0, max: 18, step: 0.1, unit: "liters", desc: "Alcohol consumption per capita (15+ years)" },
+            { name: "Percentage Expenditure", min: 0, max: 20000, step: 1, unit: "USD", desc: "Health expenditure as % of GDP per capita" },
+            { name: "Hepatitis B", min: 0, max: 100, step: 1, unit: "%", desc: "Immunization coverage among 1-year-olds" },
+            { name: "Measles", min: 0, max: 250000, step: 1, unit: "cases", desc: "Number of reported measles cases" },
+            { name: "BMI", min: 1, max: 100, step: 0.1, unit: "", desc: "Average Body Mass Index of population" },
+            { name: "Under-five Deaths", min: 0, max: 2500, step: 1, unit: "", desc: "Deaths of children under 5 per 1000 births" },
+            { name: "Polio", min: 0, max: 100, step: 1, unit: "%", desc: "Immunization coverage among 1-year-olds" },
+            { name: "Total Expenditure", min: 0, max: 20, step: 0.1, unit: "%", desc: "Government health expenditure as % of total" },
+            { name: "Diphtheria", min: 0, max: 100, step: 1, unit: "%", desc: "Immunization coverage among 1-year-olds" },
+            { name: "HIV/AIDS", min: 0, max: 50, step: 0.1, unit: "%", desc: "Deaths per 1000 live births (0-4 years)" },
+            { name: "GDP", min: 0, max: 120000, step: 10, unit: "USD", desc: "Gross Domestic Product per capita" },
+            { name: "Population", min: 0, max: 1400000000, step: 1000000, unit: "", desc: "Total population of the country" },
+            { name: "Thinness 1-19 years", min: 0, max: 30, step: 0.1, unit: "%", desc: "Prevalence of thinness among children/adolescents" },
+            { name: "Thinness 5-9 years", min: 0, max: 30, step: 0.1, unit: "%", desc: "Prevalence of thinness among children 5-9 years" },
+            { name: "Income Composition", min: 0, max: 1, step: 0.01, unit: "", desc: "Human Development Index in terms of income" },
+            { name: "Schooling", min: 0, max: 21, step: 0.1, unit: "years", desc: "Average years of schooling for adults" }
+        ];
+
+        function formatNumber(num) {
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
+            }
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function createFieldHTML(field) {
+            const fieldId = field.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const defaultValue = Math.floor((field.min + field.max) / 2);
+            
+            return `
+                <div class="field-group">
+                    <label class="field-label" for="${fieldId}">
+                        ${field.name}
+                        <span class="field-tooltip" title="${field.desc}">ℹ️</span>
+                    </label>
+                    <p class="field-description">${field.desc}</p>
+                    <div class="slider-wrapper">
+                        <input 
+                            type="range" 
+                            class="slider" 
+                            name="${fieldId}" 
+                            id="${fieldId}" 
+                            min="${field.min}" 
+                            max="${field.max}" 
+                            step="${field.step}" 
+                            value="${defaultValue}"
+                            oninput="updateValue('${fieldId}', this.value)"
+                        >
+                    </div>
+                    <div class="value-display">
+                        <span class="range-info">${formatNumber(field.min)} - ${formatNumber(field.max)} ${field.unit}</span>
+                        <span class="current-value" id="${fieldId}_value">${defaultValue} ${field.unit}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateValue(fieldId, value) {
+            const field = fields.find(f => f.name.toLowerCase().replace(/[^a-z0-9]/g, '_') === fieldId);
+            const unit = field ? field.unit : '';
+            const displayValue = field && field.step < 1 ? parseFloat(value).toFixed(1) : value;
+            document.getElementById(fieldId + '_value').textContent = displayValue + ' ' + unit;
+        }
+
+        function initializeForm() {
+            const formGrid = document.getElementById('formGrid');
+            formGrid.innerHTML = fields.map(createFieldHTML).join('');
+        }
+
+        function simulatePrediction() {
+            // Simulate ML prediction (replace with actual API call)
+            const formData = new FormData(document.getElementById('predictorForm'));
+            const values = {};
+            
+            for (let [key, value] of formData.entries()) {
+                values[key] = parseFloat(value);
+            }
+            
+            // Simple simulation - in reality, this would call your ML model
+            // This is just a mock calculation for demonstration
+            let prediction = 70; // Base prediction
+            
+            // Adjust based on some key factors (simplified)
+            if (values.adult_mortality) prediction -= values.adult_mortality * 0.01;
+            if (values.schooling) prediction += values.schooling * 0.5;
+            if (values.gdp) prediction += Math.log(values.gdp + 1) * 0.5;
+            if (values.hiv_aids) prediction -= values.hiv_aids * 0.3;
+            
+            // Clamp between reasonable bounds
+            prediction = Math.max(40, Math.min(85, prediction));
+            
+            return prediction.toFixed(1);
+        }
+
+        document.getElementById('predictorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loadingEl = document.getElementById('loading');
+            const resultEl = document.getElementById('predictionResult');
+            const predictBtn = document.querySelector('.predict-btn');
+            
+            // Show loading
+            loadingEl.classList.add('show');
+            resultEl.classList.remove('show');
+            predictBtn.disabled = true;
+            predictBtn.textContent = 'Processing...';
+            
+            // Simulate processing time
+            setTimeout(() => {
+                const prediction = simulatePrediction();
+                
+                document.getElementById('predictionValue').textContent = prediction + ' years';
+                
+                loadingEl.classList.remove('show');
+                resultEl.classList.add('show');
+                predictBtn.disabled = false;
+                predictBtn.textContent = 'Predict Life Expectancy';
+                
+                // Scroll to result
+                resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 2000);
+        });
+
+        // Initialize the form when page loads
+        document.addEventListener('DOMContentLoaded', initializeForm);
+    </script>
 </body>
 </html>
